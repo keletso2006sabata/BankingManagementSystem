@@ -17,7 +17,7 @@ public abstract class Account {
     }
 
     public void deposit(double amount) {
-        if (amount > 0) {
+        if (amount > 0 && Double.isFinite(amount)) {
              balance = balance + amount;
             System.out.println("Deposit successful");
         } else {
@@ -35,10 +35,13 @@ public abstract class Account {
     public String getBranch(){
         return branch;
     }
-    public void setBalance(double balance){
-        this.balance = balance;
+    public void setBalance(double balance) {
+        if (balance >= 0 && Double.isFinite(balance)) {
+            this.balance = balance;
+        } else {
+            System.out.println("Invalid balance");
+        }
     }
-
     @Override
     public String toString() {
         return "Account{" +
