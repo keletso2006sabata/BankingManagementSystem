@@ -25,7 +25,7 @@ public class ChequeAccount extends Account {
 
     @Override
     public void withdraw(double amount) {
-        if (amount > 0 && amount <= getBalance()) {
+        if (Double.isFinite (amount) && amount > 0 && amount <= getBalance()) {
             setBalance(getBalance() - amount);
             System.out.println("Withdrawal successful");
         } else {
