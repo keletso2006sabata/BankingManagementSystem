@@ -33,7 +33,7 @@ public class Main {
         System.out.println("Investment Interest: "
                 + Investment.calculateInterest());
 
-        for (Account account : customer.getAccounts()){
+        for (Account account : customer.getAccounts(Account)){
             System.out.println(account);
         }
 
