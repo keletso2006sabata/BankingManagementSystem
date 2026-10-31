@@ -9,7 +9,7 @@ public class SavingsAccount extends Account implements InterestBearing{
     }
     @Override
     public double calculateInterest(){
-        return getBalance()*interestRate;
+        return getBalance() * interestRate;
     }
 
     @Override
@@ -17,7 +17,8 @@ public class SavingsAccount extends Account implements InterestBearing{
         super.deposit(amount);
 }
      @Override
-    public void withdraw (double amount) {
+    public void withdraw (double amount)
+     {
         System.out.println("Withdrawals are not allowed from Savings Account");
      }
      @Override
