@@ -18,14 +18,20 @@ public class InvestmentAccount extends Account implements InterestBearing {
         return getBalance() * interestRate;
 
     }
+
+    @Override
+    public void deposit(double amount) {
+        super.deposit(amount);
+    }
     @Override
     public void withdraw (double amount){
-        if (amount > 0 && amount <= getBalance()){
+        if (Double.isFinite(amount) &&amount > 0 && amount <= getBalance()){
     setBalance(getBalance() - amount);
     System.out.println("Withdrawal successful");
         }
+
         else{
-            System.out.println("Insufficient funds");
+            System.out.println("Insufficient funds or invalid amount");
         }
     }
     @Override
