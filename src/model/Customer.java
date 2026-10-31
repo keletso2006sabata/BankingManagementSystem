@@ -14,7 +14,7 @@ public class Customer {
     private List<Account> accounts = new ArrayList<>();
 
     public Customer(int customerID, String firstName, String surname, String address, String phoneNumber, String email, List<Account> accounts) {
-        CustomerID = customerID;
+        this.CustomerID = customerID;
         this.firstName = firstName;
         this.surname = surname;
         this.address = address;
@@ -29,7 +29,7 @@ public class Customer {
 
     public void setCustomerID(int customerID) {
 
-        CustomerID = customerID;
+        this.CustomerID = customerID;
     }
 
     public String getFirstName() {
@@ -85,7 +85,12 @@ public class Customer {
         return accounts;
     }
     public void addAccount(Account account){
-        accounts.add(account);
+        if(account != null && !accounts.contains(account)){
+            accounts.add(account);
+        }
+    }
+    public void removeAccount(Account account){
+        accounts.remove(account);
     }
 
     public void setAccounts(List<Account> accounts) {
