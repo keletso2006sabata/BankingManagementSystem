@@ -10,6 +10,10 @@ public abstract class Account {
         this.accountNumber = accountNumber;
         this.balance = balance;
         this.branch = branch;
+        if  (balance >= 0 && Double.isFinite(balance)){
+            this.balance = balance;
+        } else {throw new IllegalArgumentException("Invalid opening balance");
+        }
     }
 
     public void deposit(double amount) {
