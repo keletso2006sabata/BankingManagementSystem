@@ -13,7 +13,7 @@ public class Customer {
 
     private List<Account> accounts = new ArrayList<>();
 
-    public Customer(int customerID, String firstName, String surname, String address, String phoneNumber, String email, List<Account> accounts) {
+    public Customer(int customerID, String firstName, String surname, String address, String phoneNumber, String email) {
         this.CustomerID = customerID;
         this.firstName = firstName;
         this.surname = surname;
