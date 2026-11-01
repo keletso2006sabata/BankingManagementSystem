@@ -20,7 +20,7 @@ public class Customer {
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.accounts = accounts;
+
     }
 
     public int getCustomerID() {
