@@ -7,8 +7,12 @@ public class Manager extends BankStaff{
         super(staffID, firstName, surname, contactNumber, position, branch, username, passwordHash);
 
     }
+    public void viewReports(){
+        System.out.println("Displaying bank reports");
+    }
+
     public void manageCustomerRecords(){
-        System.out.println("Manging customer records");
+        System.out.println("Managing customer records");
     }
     @Override
     public String toString(){

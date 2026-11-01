@@ -9,7 +9,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="Banking Management System" target="1.5" />
+      <module name="Banking Management System" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
