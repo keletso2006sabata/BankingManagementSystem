@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 public class Transaction {
 
     private int transactionID;
+    private String accountNumber;
     private String transactionType;
     private double amount;
     private LocalDateTime transactionDate;
 
-    public Transaction(int transactionID, String transactionType, double amount, LocalDateTime transactionDate) {
+    public Transaction(int transactionID,String accountNumber, String transactionType, double amount, LocalDateTime transactionDate) {
         this.transactionID = transactionID;
+        this.accountNumber = accountNumber;
         this.transactionType = transactionType;
         this.amount = amount;
         this.transactionDate = transactionDate;
@@ -25,6 +27,10 @@ public class Transaction {
 
     public int getTransactionID() {
         return transactionID;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
     public String getTransactionType() {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Customer {
-    private int CustomerID;
+    private int customerID;
     private String firstName;
     private String surname;
     private String address;
@@ -14,7 +14,7 @@ public class Customer {
     private List<Account> accounts = new ArrayList<>();
 
     public Customer(int customerID, String firstName, String surname, String address, String phoneNumber, String email) {
-        this.CustomerID = customerID;
+        this.customerID = customerID;
         this.firstName = firstName;
         this.surname = surname;
         this.address = address;
@@ -24,12 +24,12 @@ public class Customer {
     }
 
     public int getCustomerID() {
-        return CustomerID;
+        return customerID;
     }
 
     public void setCustomerID(int customerID) {
 
-        this.CustomerID = customerID;
+        this.customerID = customerID;
     }
 
     public String getFirstName() {
@@ -94,13 +94,15 @@ public class Customer {
     }
 
     public void setAccounts(List<Account> accounts) {
-        this.accounts = accounts;
+        if (accounts != null) {
+            this.accounts = new ArrayList<>(accounts);
+        }
     }
 
     @Override
     public String toString() {
         return "Customer{" +
-                "CustomerID=" + CustomerID +
+                "CustomerID=" + customerID +
                 ", firstName='" + firstName + '\'' +
                 ", surname='" + surname + '\'' +
                 ", address='" + address + '\'' +

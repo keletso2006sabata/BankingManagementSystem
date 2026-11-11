@@ -1,4 +1,6 @@
 package view;
+
+import util.BankData;
 import model.*;
 public class Main {
     public static void main(String[] args){
@@ -14,6 +16,7 @@ public class Main {
         customer.addAccount(savings);
         customer.addAccount(investment);
         customer.addAccount(cheque);
+        BankData.accounts.addAll(customer.getAccounts());
 
         System.out.println("=======SAVINGS ACCOUNTS =======");
         savings.deposit(200);
@@ -28,6 +31,19 @@ public class Main {
         cheque.withdraw(200);
 
         System.out.println("\n===== MONTHLY INTEREST =====");
+        System.out.println("\n===== APPLY MONTHLY INTEREST =====");
+
+        BankData.applyMonthlyInterest();
+        System.out.println("\n===== UPDATED BALANCES =====");
+
+        for (Account account : customer.getAccounts()) {
+
+            System.out.println(
+                    account.getAccountNumber()
+                            + " Balance: BWP "
+                            + String.format("%.2f", account.getBalance())
+            );
+        }
 
         System.out.println("Savings Interest: BWP " + savings.calculateInterest());
 
@@ -46,7 +62,7 @@ public class Main {
         //TEST THE TRANSACTION CLASS
         System.out.println("\n===== TRANSACTION RECORD ======");
 
-        Transaction transaction = new Transaction(1, "Deposit", 200, java.time.LocalDateTime.now());
+        Transaction transaction = new Transaction(1, "S562", "Deposit", 200, java.time.LocalDateTime.now());
         transaction.record();
 
         //TEST TELLER CLASS

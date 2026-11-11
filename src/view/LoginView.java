@@ -10,12 +10,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-
 public class LoginView {
 
     public void show(Stage stage) {
-        Label title = new Label("BANKING MANGEMENT SYSTEM");
+        Label title = new Label("BANKING MANAGEMENT SYSTEM");
 
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter Username");
@@ -35,7 +33,8 @@ public class LoginView {
             if (Username.isBlank() || Password.isBlank()){
                 message.setText("Please enter username and password");
             } else{
-                message.setText("Login details entered");
+                DashboardView dashboard = new DashboardView();
+                dashboard.show(stage);
             }
         });
         VBox layout = new VBox(15);
