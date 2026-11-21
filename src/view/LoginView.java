@@ -1,5 +1,7 @@
+
 package view;
 
+import dao.CustomerDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,6 +15,7 @@ import javafx.stage.Stage;
 public class LoginView {
 
     public void show(Stage stage) {
+
         Label title = new Label("BANKING MANAGEMENT SYSTEM");
 
         TextField usernameField = new TextField();
@@ -27,21 +30,43 @@ public class LoginView {
 
         loginButton.setOnAction(event -> {
 
-            String Username = usernameField.getText();
-            String Password = passwordField.getText();
+            String username = usernameField.getText().trim();
+            String password = passwordField.getText();
 
-            if (Username.isBlank() || Password.isBlank()){
+            if (username.isBlank() || password.isBlank()) {
+
                 message.setText("Please enter username and password");
-            } else{
-                DashboardView dashboard = new DashboardView();
-                dashboard.show(stage);
+
+            } else {
+
+                CustomerDAO customerDAO = new CustomerDAO();
+
+                boolean valid = customerDAO.loginCustomer(
+                        username, password);
+
+                if (valid) {
+
+                    message.setText("Login successful!");
+
+                    DashboardView dashboard = new DashboardView();
+                    dashboard.show(stage);
+
+                } else {
+
+                    message.setText("Invalid username or password");
+                }
             }
         });
+
         VBox layout = new VBox(15);
+
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(30));
 
-        layout.getChildren().addAll(title,usernameField,passwordField,loginButton,message);
+        layout.getChildren().addAll(
+                title, usernameField, passwordField,
+                loginButton, message
+        );
 
         Scene scene = new Scene(layout, 400, 350);
 

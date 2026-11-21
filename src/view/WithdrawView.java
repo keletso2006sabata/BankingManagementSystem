@@ -1,9 +1,13 @@
-
 package view;
 
 import model.Account;
 import model.SavingsAccount;
-import util.BankData;
+import model.InvestmentAccount;
+import model.ChequeAccount;
+
+import dao.AccountDAO;
+import dao.TransactionDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -40,57 +44,91 @@ public class WithdrawView {
             } else {
 
                 try {
-                    double withdrawalAmount =
-                            Double.parseDouble(amount.getText());
 
-                    if (withdrawalAmount <= 0 ||
-                            !Double.isFinite(withdrawalAmount)) {
+                    double withdrawalAmount =
+                            Double.parseDouble(amount.getText().trim());
+
+                    if (withdrawalAmount <= 0
+                            || !Double.isFinite(withdrawalAmount)) {
 
                         message.setText("Enter a valid withdrawal amount");
+                        return;
+                    }
+
+                    AccountDAO accountDAO = new AccountDAO();
+
+                    Account account = accountDAO.getAccountByNumber(
+                            accountNumber.getText().trim()
+                    );
+
+                    if (account == null) {
+
+                        message.setText("Account number not found");
+
+                    } else if (account instanceof SavingsAccount) {
+
+                        message.setText(
+                                "Savings Account does not allow withdrawals"
+                        );
+
+                    } else if (!(account instanceof InvestmentAccount)
+                            && !(account instanceof ChequeAccount)) {
+
+                        message.setText("Invalid account type");
+
+                    } else if (withdrawalAmount > account.getBalance()) {
+
+                        message.setText("Insufficient funds");
 
                     } else {
 
-                        Account account = BankData.findAccount(
-                                accountNumber.getText().trim()
+                        double newBalance =
+                                account.getBalance() - withdrawalAmount;
+
+                        boolean updated = accountDAO.updateBalance(
+                                account.getAccountNumber(),
+                                newBalance
                         );
 
-                        if (account == null) {
+                        if (updated) {
 
-                            message.setText("Account number not found");
+                            TransactionDAO transactionDAO =
+                                    new TransactionDAO();
 
-                        } else if (account instanceof SavingsAccount) {
+                            boolean recorded =
+                                    transactionDAO.saveTransaction(
+                                            account.getAccountNumber(),
+                                            "Withdrawal",
+                                            withdrawalAmount
+                                    );
 
-                            message.setText("Savings Account does not allow withdrawals");
+                            if (recorded) {
 
-                        } else if (!(account instanceof model.InvestmentAccount)
-                                && !(account instanceof model.ChequeAccount)) {
+                                message.setText(
+                                        "Withdrawal successful!\n"
+                                                + "New Balance: BWP "
+                                                + String.format("%.2f", newBalance)
+                                );
 
-                            message.setText("Invalid account type");
+                            } else {
 
-                        } else if (withdrawalAmount > account.getBalance()) {
-                            message.setText("Insufficient funds");
+                                message.setText(
+                                        "Withdrawal successful, "
+                                                + "but transaction recording failed."
+                                );
+                            }
 
                         } else {
 
-                            account.withdraw(withdrawalAmount);
+                            message.setText("Withdrawal failed");
 
-                            BankData.addTransaction(
-                                    account.getAccountNumber(),
-                                    "Withdrawal",
-                                    withdrawalAmount
-                            );
-
-                            message.setText(
-                                    "Withdrawal successful!"
-                                            + "\nNew Balance: BWP "
-                                            + String.format("%.2f", account.getBalance())
-                            );
                         }
                     }
 
                 } catch (NumberFormatException e) {
 
                     message.setText("Please enter a valid amount");
+
                 }
             }
         });
@@ -101,12 +139,17 @@ public class WithdrawView {
         });
 
         VBox layout = new VBox(15);
+
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
         layout.getChildren().addAll(
-                title, accountNumber, amount,
-                withdraw, message, back
+                title,
+                accountNumber,
+                amount,
+                withdraw,
+                message,
+                back
         );
 
         Scene scene = new Scene(layout, 450, 450);

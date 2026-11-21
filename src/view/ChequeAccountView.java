@@ -2,7 +2,10 @@ package view;
 
 import model.Customer;
 import model.ChequeAccount;
-import util.BankData;
+import dao.AccountDAO;
+import dao.ChequeAccountDAO;
+import dao.CustomerDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -41,7 +44,6 @@ public class ChequeAccountView {
 
         Label message = new Label();
 
-
         submit.setOnAction(event -> {
 
             if (customerID.getText().isBlank()
@@ -54,52 +56,82 @@ public class ChequeAccountView {
                 message.setText("Please fill in all fields");
 
             } else {
+
                 try {
-                    int id = Integer.parseInt(customerID.getText().trim());
-                    double amount = Double.parseDouble(deposit.getText());
 
-                    Customer customer = null;
+                    int id = Integer.parseInt(
+                            customerID.getText().trim());
 
-                    for (Customer c : BankData.customers) {
-                        if (c.getCustomerID() == id) {
-                            customer = c;
-                            break;
-                        }
+                    double amount = Double.parseDouble(
+                            deposit.getText().trim());
+
+                    if (amount <= 0 || !Double.isFinite(amount)) {
+                        message.setText("Enter a valid opening deposit");
+                        return;
                     }
 
+                    CustomerDAO customerDAO = new CustomerDAO();
+
+                    Customer customer =
+                            customerDAO.getCustomerByID(id);
+
                     if (customer == null) {
-                        message.setText("Customer not found. Register first.");
+                        message.setText(
+                                "Customer not found. Register first.");
+                        return;
+                    }
 
-                    } else if (amount <= 0 || !Double.isFinite(amount)) {
-                        message.setText("Enter a valid opening deposit");
+                    ChequeAccount account = new ChequeAccount(
+                            accountNumber.getText().trim(),
+                            amount,
+                            branch.getText().trim(),
+                            companyName.getText().trim(),
+                            companyAddress.getText().trim()
+                    );
 
-                    } else if (BankData.findAccount(accountNumber.getText().trim()) != null) {
-                        message.setText("Account number already exists");
+                    AccountDAO accountDAO = new AccountDAO();
+
+                    boolean accountSaved =
+                            accountDAO.saveAccount(account, id);
+
+                    if (accountSaved) {
+
+                        ChequeAccountDAO chequeDAO =
+                                new ChequeAccountDAO();
+
+                        boolean chequeSaved =
+                                chequeDAO.saveChequeAccount(account);
+
+                        if (chequeSaved) {
+
+                            customer.addAccount(account);
+
+                            message.setText(
+                                    "Cheque Account created successfully!");
+
+                        } else {
+
+                            message.setText(
+                                    "Company details could not be saved.");
+                        }
 
                     } else {
-                        ChequeAccount account = new ChequeAccount(
-                                accountNumber.getText().trim(),
-                                amount,
-                                branch.getText().trim(),
-                                companyName.getText().trim(),
-                                companyAddress.getText().trim()
-                        );
 
-                        BankData.accounts.add(account);
-                        customer.addAccount(account);
-
-                        message.setText("Cheque Account created successfully!");
+                        message.setText(
+                                "Cheque Account could not be saved.");
                     }
 
                 } catch (NumberFormatException e) {
-                    message.setText("Enter valid Customer ID and deposit");
+
+                    message.setText(
+                            "Enter valid Customer ID and deposit");
 
                 } catch (IllegalArgumentException e) {
+
                     message.setText(e.getMessage());
                 }
             }
         });
-
 
         back.setOnAction(event -> {
             OpenAccountView view = new OpenAccountView();
@@ -107,6 +139,7 @@ public class ChequeAccountView {
         });
 
         VBox layout = new VBox(15);
+
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 

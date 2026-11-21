@@ -18,6 +18,14 @@ public class ChequeAccount extends Account {
 
 
     }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
     @Override
     public void deposit(double amount) {
         super.deposit(amount);

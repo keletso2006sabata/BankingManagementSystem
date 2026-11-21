@@ -1,7 +1,8 @@
 package view;
 
 import model.Account;
-import util.BankData;
+import dao.AccountDAO;
+import dao.TransactionDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -38,41 +39,61 @@ public class DepositView {
             } else {
 
                 try {
-                    double depositAmount =
-                            Double.parseDouble(amount.getText());
 
-                    if (depositAmount <= 0 ||
-                            !Double.isFinite(depositAmount)) {
+                    double depositAmount =
+                            Double.parseDouble(amount.getText().trim());
+
+                    if (depositAmount <= 0
+                            || !Double.isFinite(depositAmount)) {
 
                         message.setText("Enter a valid deposit amount");
+                        return;
+                    }
+
+                    AccountDAO accountDAO = new AccountDAO();
+
+                    Account account = accountDAO.getAccountByNumber(
+                            accountNumber.getText().trim()
+                    );
+
+                    if (account == null) {
+
+                        message.setText("Account number not found");
 
                     } else {
 
-                        Account account = BankData.findAccount(
-                                accountNumber.getText().trim()
+                        double newBalance =
+                                account.getBalance() + depositAmount;
+
+                        boolean updated = accountDAO.updateBalance(
+                                account.getAccountNumber(),
+                                newBalance
                         );
 
-                        if (account == null) {
+                        if (updated) {
 
-                            message.setText("Account number not found");
+                            TransactionDAO transactionDAO =
+                                    new TransactionDAO();
 
-                        } else {
-
-                            account.deposit(depositAmount);
-
-                            BankData.addTransaction(
+                            transactionDAO.saveTransaction(
                                     account.getAccountNumber(),
                                     "Deposit",
                                     depositAmount
                             );
 
                             message.setText("Deposit successful!");
+
+                        } else {
+
+                            message.setText("Deposit failed");
+
                         }
                     }
 
                 } catch (NumberFormatException e) {
 
                     message.setText("Please enter a valid amount");
+
                 }
             }
         });
@@ -83,12 +104,17 @@ public class DepositView {
         });
 
         VBox layout = new VBox(15);
+
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
         layout.getChildren().addAll(
-                title, accountNumber, amount,
-                deposit, message, back
+                title,
+                accountNumber,
+                amount,
+                deposit,
+                message,
+                back
         );
 
         Scene scene = new Scene(layout, 450, 450);
@@ -97,4 +123,5 @@ public class DepositView {
         stage.setScene(scene);
         stage.show();
     }
+
 }

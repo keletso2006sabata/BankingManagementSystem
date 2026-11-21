@@ -1,14 +1,15 @@
 
 package view;
 
-import model.Customer;
-import util.BankData;
+import dao.CustomerDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -36,10 +37,18 @@ public class RegisterView {
         TextField email = new TextField();
         email.setPromptText("Enter Email");
 
+        TextField username = new TextField();
+        username.setPromptText("Enter Username");
+
+        PasswordField password = new PasswordField();
+        password.setPromptText("Enter Password");
+
         Button register = new Button("Register");
         Button back = new Button("Back");
 
         Label message = new Label();
+
+        CustomerDAO customerDAO = new CustomerDAO();
 
         register.setOnAction(event -> {
 
@@ -48,47 +57,50 @@ public class RegisterView {
                     || surname.getText().isBlank()
                     || address.getText().isBlank()
                     || phone.getText().isBlank()
-                    || email.getText().isBlank()) {
+                    || email.getText().isBlank()
+                    || username.getText().isBlank()
+                    || password.getText().isBlank()) {
 
                 message.setText("Please fill in all fields");
 
             } else {
+
                 try {
-                    int id = Integer.parseInt(customerID.getText().trim());
 
-                    boolean exists = false;
+                    int id = Integer.parseInt(
+                            customerID.getText().trim());
 
-                    for (Customer c : BankData.customers) {
-                        if (c.getCustomerID() == id) {
-                            exists = true;
-                            break;
-                        }
-                    }
+                    boolean saved = customerDAO.registerCustomer(
+                            id,
+                            firstName.getText().trim(),
+                            surname.getText().trim(),
+                            address.getText().trim(),
+                            phone.getText().trim(),
+                            email.getText().trim(),
+                            username.getText().trim(),
+                            password.getText()
+                    );
 
-                    if (exists) {
-                        message.setText("Customer ID already exists!");
+                    if (saved) {
+
+                        message.setText(
+                                "Customer registered successfully!");
+
                     } else {
 
-                        Customer customer = new Customer(
-                                id,
-                                firstName.getText().trim(),
-                                surname.getText().trim(),
-                                address.getText().trim(),
-                                phone.getText().trim(),
-                                email.getText().trim()
-                        );
-
-                        BankData.customers.add(customer);
-
-                        message.setText("Customer registered successfully!");
+                        message.setText(
+                                "Registration failed. Check existing details.");
                     }
 
                 } catch (NumberFormatException e) {
+
                     message.setText("Enter a valid Customer ID");
                 }
             }
         });
+
         back.setOnAction(event -> {
+
             DashboardView dashboard = new DashboardView();
             dashboard.show(stage);
         });
@@ -99,12 +111,21 @@ public class RegisterView {
         layout.setPadding(new Insets(20));
 
         layout.getChildren().addAll(
-                title, customerID, firstName, surname,
-                address, phone, email,
-                register, message, back
+                title,
+                customerID,
+                firstName,
+                surname,
+                address,
+                phone,
+                email,
+                username,
+                password,
+                register,
+                message,
+                back
         );
 
-        Scene scene = new Scene(layout, 450, 550);
+        Scene scene = new Scene(layout, 450, 650);
 
         stage.setTitle("Customer Registration");
         stage.setScene(scene);

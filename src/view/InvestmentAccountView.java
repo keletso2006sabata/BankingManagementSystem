@@ -2,7 +2,8 @@ package view;
 
 import model.Customer;
 import model.InvestmentAccount;
-import util.BankData;
+import dao.AccountDAO;
+import dao.CustomerDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ public class InvestmentAccountView {
     public void show(Stage stage) {
 
         Label title = new Label("Open Investment Account");
+
         TextField customerID = new TextField();
         customerID.setPromptText("Enter Registered Customer ID");
 
@@ -34,8 +36,8 @@ public class InvestmentAccountView {
 
         Label message = new Label();
 
-
         submit.setOnAction(event -> {
+
             if (customerID.getText().isBlank()
                     || accountNumber.getText().isBlank()
                     || branch.getText().isBlank()
@@ -48,39 +50,41 @@ public class InvestmentAccountView {
                     int id = Integer.parseInt(customerID.getText().trim());
                     double amount = Double.parseDouble(deposit.getText());
 
-                    Customer customer = null;
-
-                    for (Customer c : BankData.customers) {
-                        if (c.getCustomerID() == id) {
-                            customer = c;
-                            break;
-                        }
+                    if (amount < 500 || !Double.isFinite(amount)) {
+                        message.setText("Minimum opening deposit is BWP 500.00");
+                        return;
                     }
+
+                    CustomerDAO customerDAO = new CustomerDAO();
+
+                    Customer customer = customerDAO.getCustomerByID(id);
 
                     if (customer == null) {
                         message.setText("Customer not found. Register first.");
+                        return;
+                    }
 
-                    } else if (amount < 500 || !Double.isFinite(amount)) {
-                        message.setText("Minimum opening deposit is BWP 500.00");
+                    InvestmentAccount account = new InvestmentAccount(
+                            accountNumber.getText().trim(),
+                            amount,
+                            branch.getText().trim()
+                    );
 
-                    } else if (BankData.findAccount(accountNumber.getText().trim()) != null) {
-                        message.setText("Account number already exists");
+                    AccountDAO accountDAO = new AccountDAO();
 
-                    } else {
-                        InvestmentAccount account = new InvestmentAccount(
-                                accountNumber.getText().trim(),
-                                amount,
-                                branch.getText().trim()
-                        );
+                    boolean saved = accountDAO.saveAccount(account, id);
 
-                        BankData.accounts.add(account);
+                    if (saved) {
                         customer.addAccount(account);
-
                         message.setText("Investment Account created successfully!");
+                    } else {
+                        message.setText("Account could not be saved.");
                     }
 
                 } catch (NumberFormatException e) {
                     message.setText("Enter valid Customer ID and deposit");
+                } catch (IllegalArgumentException e) {
+                    message.setText(e.getMessage());
                 }
             }
         });
@@ -94,14 +98,15 @@ public class InvestmentAccountView {
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
-        layout.getChildren().addAll(title, customerID, accountNumber, branch, deposit, submit,message, back);
+        layout.getChildren().addAll(
+                title, customerID, accountNumber,
+                branch, deposit, submit, message, back
+        );
 
         Scene scene = new Scene(layout, 450, 450);
 
         stage.setTitle("Investment Account");
         stage.setScene(scene);
         stage.show();
-
     }
 }
-

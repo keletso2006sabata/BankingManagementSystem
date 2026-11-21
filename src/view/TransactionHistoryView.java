@@ -1,7 +1,11 @@
+
 package view;
 
+import model.Account;
 import model.Transaction;
-import util.BankData;
+import dao.AccountDAO;
+import dao.TransactionDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +14,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class TransactionHistoryView {
 
@@ -24,10 +30,7 @@ public class TransactionHistoryView {
         Button back = new Button("Back");
 
         Label message = new Label();
-
-        VBox layout = new VBox(15);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
+        message.setWrapText(true);
 
         viewHistory.setOnAction(event -> {
 
@@ -39,28 +42,34 @@ public class TransactionHistoryView {
 
                 String number = accountNumber.getText().trim();
 
-                if (BankData.findAccount(number) == null) {
+                AccountDAO accountDAO = new AccountDAO();
+
+                Account account = accountDAO.getAccountByNumber(number);
+
+                if (account == null) {
 
                     message.setText("Account number not found");
 
                 } else {
 
-                    StringBuilder history = new StringBuilder();
+                    TransactionDAO transactionDAO = new TransactionDAO();
 
-                    for (Transaction transaction : BankData.transactions) {
+                    List<Transaction> transactions =
+                            transactionDAO.getTransactionsByAccountNumber(number);
 
-                        if (transaction.getAccountNumber().equals(number)) {
-
-                            history.append(transaction.toString())
-                                    .append("\n\n");
-                        }
-                    }
-
-                    if (history.length() == 0) {
+                    if (transactions.isEmpty()) {
 
                         message.setText("No transactions found");
 
                     } else {
+
+                        StringBuilder history = new StringBuilder();
+
+                        for (Transaction transaction : transactions) {
+
+                            history.append(transaction.toString())
+                                    .append("\n\n");
+                        }
 
                         message.setText(history.toString());
                     }
@@ -73,9 +82,17 @@ public class TransactionHistoryView {
             dashboard.show(stage);
         });
 
+        VBox layout = new VBox(15);
+
+        layout.setAlignment(Pos.CENTER);
+        layout.setPadding(new Insets(20));
+
         layout.getChildren().addAll(
-                title, accountNumber,
-                viewHistory, message, back
+                title,
+                accountNumber,
+                viewHistory,
+                message,
+                back
         );
 
         Scene scene = new Scene(layout, 550, 550);
@@ -85,4 +102,3 @@ public class TransactionHistoryView {
         stage.show();
     }
 }
-
