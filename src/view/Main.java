@@ -3,7 +3,7 @@ package view;
 import util.BankData;
 import model.*;
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         Customer customer = new Customer(321, "Blessing", "Sabs", "PO Box Maitengwe", "75232618", "B.Sabs@gmail.com");
 
@@ -54,7 +54,7 @@ public class Main {
 
         System.out.println("\n===== CUSTOMER ACCOUNTS =====");
 
-        for (Account account : customer.getAccounts()){
+        for (Account account : customer.getAccounts()) {
             System.out.println(account);
             System.out.println("-----------------");
         }
